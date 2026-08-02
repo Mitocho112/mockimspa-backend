@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const { auth } = require('../middleware/auth');
+const { auth, requireAdmin } = require('../middleware/auth');
 
 router.post('/', auth, async (req, res) => {
   const { contact_id, branch_id, service, guests, date, time, notes } = req.body;
@@ -59,6 +59,16 @@ router.patch('/:id', auth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update booking' });
+  }
+});
+
+router.delete('/:id', auth, requireAdmin, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM bookings WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete booking' });
   }
 });
 
