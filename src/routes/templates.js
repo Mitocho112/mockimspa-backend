@@ -27,6 +27,19 @@ router.post('/', auth, requireAdmin, async (req, res) => {
   }
 });
 
+router.patch('/:id', auth, requireAdmin, async (req, res) => {
+  const { title, body } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE message_templates SET title = COALESCE($1, title), body = COALESCE($2, body) WHERE id = $3 RETURNING *',
+      [title, body, req.params.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update template' });
+  }
+});
 router.delete('/:id', auth, requireAdmin, async (req, res) => {
   try {
     await pool.query('DELETE FROM message_templates WHERE id = $1', [req.params.id]);
