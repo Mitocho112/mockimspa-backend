@@ -24,7 +24,7 @@ router.get('/', auth, async (req, res) => {
       SELECT bookings.*, contacts.name as contact_name, contacts.phone, branches.name as branch_name
       FROM bookings
       JOIN contacts ON bookings.contact_id = contacts.id
-      JOIN branches ON bookings.branch_id = branches.id
+      LEFT JOIN branches ON bookings.branch_id = branches.id
       WHERE 1=1
     `;
     const params = [];
